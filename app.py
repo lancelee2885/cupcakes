@@ -40,11 +40,11 @@ def get_individual_cupcake(cupcake_id):
 @app.route('/api/cupcakes', methods=['POST'])
 def create_new_cupcake():
     """Create a cupcake with flavor, size, rating and image data from the body of the request."""
-    
+    # breakpoint()
     flavor = request.json["flavor"]
     size = request.json["size"]
     rating = request.json["rating"]
-    image = request.json["image"]
+    image = request.json["image"] if request.json["image"] else None
     
     cupcake = Cupcake(
         flavor=flavor,
@@ -67,7 +67,7 @@ def update_current_cupcake(cupcake_id):
     cupcake.flavor = request.json["flavor"]
     cupcake.size = request.json["size"]
     cupcake.rating = request.json["rating"]
-    cupcake.image = request.json["image"]
+    cupcake.image = request.json["image"] if request.json["image"] else None
 
     db.session.commit()
 

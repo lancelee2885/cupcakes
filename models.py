@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+DEFAULT_IMG = 'https://tinyurl.com/demo-cupcake'
 
 class Cupcake(db.Model):
     """Making cupcake instances"""
@@ -30,7 +31,7 @@ class Cupcake(db.Model):
     image = db.Column(
         db.Text,
         nullable = False,
-        default = 'https://tinyurl.com/demo-cupcake'
+        default = DEFAULT_IMG
     )
 
     def serialize(self):
