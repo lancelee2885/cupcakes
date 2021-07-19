@@ -2,6 +2,7 @@
 
 from flask import Flask, request, jsonify, render_template
 from models import db, connect_db, Cupcake
+from forms import CupcakeForm
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
@@ -89,4 +90,7 @@ def delete_current_cupcake(cupcake_id):
 
 @app.route('/')
 def root():
-    return render_template("base.html")
+
+    form = CupcakeForm()
+
+    return render_template("base.html", form=form)
