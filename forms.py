@@ -5,7 +5,7 @@ from wtforms import StringField, SelectField
 from wtforms.validators import InputRequired, Optional, URL
 from wtforms.widgets import TextArea
 
-class CupcakeForm (FlaskForm):
+class CupcakeForm(FlaskForm):
     """Form for adding cupcakes"""
 
     flavor = StringField("Flavor: ", validators=[InputRequired()])
@@ -14,3 +14,7 @@ class CupcakeForm (FlaskForm):
     image = StringField("Image URL: ", validators=[URL(), Optional()])
 
     
+class SearchTermForm(FlaskForm):
+    """Form for search team on root"""
+
+    term = StringField("Search: ", validators=[Optional()])

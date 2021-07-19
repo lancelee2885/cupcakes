@@ -70,9 +70,13 @@ class CupcakeViewsTestCase(TestCase):
     def test_get_cupcake(self):
         with app.test_client() as client:
             url = f"/api/cupcakes/{self.cupcake.id}"
-            resp = client.get(url)
 
+            resp = client.get(url)
             self.assertEqual(resp.status_code, 200)
+
+            resp_failed = client.get("/api/cupcakes/0")
+            self.assertEqual(resp_failed.status_code, 404)
+
             data = resp.json
             self.assertEqual(data, {
                 "cupcake": {
@@ -120,6 +124,14 @@ class CupcakeViewsTestCase(TestCase):
             })
             self.assertEqual(resp.status_code, 200)
 
+            resp_failed = client.patch("/api/cupcakes/0", json={
+                "flavor": "strawberry",
+                "size": "medium",
+                "rating": "7",
+                "image": "http://test.com/cupcake2.jpg"
+            })
+            self.assertEqual(resp_failed.status_code, 404)
+
             data = resp.json
             self.assertIsInstance(data['cupcake']['id'], int)
             del data['cupcake']['id']
@@ -139,8 +151,11 @@ class CupcakeViewsTestCase(TestCase):
         with app.test_client() as client:
 
             url = f"/api/cupcakes/{self.cupcake.id}"
-            resp = client.delete(url)
 
+            resp = client.delete(url)
             self.assertEqual(resp.status_code, 200)
+
+            resp_failed = client.delete("/api/cupcakes/0")
+            self.assertEqual(resp_failed.status_code, 404)
 
             self.assertEqual(resp.json, {"message": "Deleted"})

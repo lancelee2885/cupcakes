@@ -10,18 +10,42 @@
   </head>
   <body>
     <h1 class="text-center">cupcakes</h1>
+
+    <div class="container" >
+      <form id="search-form" action="/api/cupcakes" class="form-horizontal">
+
+        {{ searchForm.hidden_tag() }}
+      
+        {% for field in searchForm if field.widget.input_type != "hidden" %}
+        <div class="form-group">
+      
+          <p>
+            {{ field.label(class_="form-label mt-4")}}
+            {{ field(class_="form-control") }}
+      
+            {% for error in field.errors %}
+            {{ error }}
+            {% endfor %}
+          </p>
+          {% endfor %}
+        </div>
+        <button class="btn btn-primary" type="submit" id="create-cupcake">Search</button>
+      </form>
+    </div>
+
     <div class="container">
         <ul id="cupcake-list">
         <!-- put stuff here -->
         </ul>
     </div>
 
-    <div class="container">
-      <form action="/api/cupcakes" class="form-horizontal">
 
-        {{ form.hidden_tag() }}
+    <div class="container" >
+      <form id="cupcake-form" action="/api/cupcakes" class="form-horizontal">
+
+        {{ cupcakeForm.hidden_tag() }}
       
-        {% for field in form if field.widget.input_type != "hidden" %}
+        {% for field in cupcakeForm if field.widget.input_type != "hidden" %}
         <div class="form-group">
       
           <p>
@@ -37,6 +61,7 @@
         <button class="btn btn-primary" type="submit" id="create-cupcake">Add</button>
       </form>
     </div>
+
 
   </body>
   <script src="http://unpkg.com/jquery"></script>

@@ -2,7 +2,7 @@
 
 from flask import Flask, request, jsonify, render_template
 from models import db, connect_db, Cupcake
-from forms import CupcakeForm
+from forms import CupcakeForm, SearchTermForm
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
@@ -19,6 +19,7 @@ app.config['SECRET_KEY'] = 'THIS IS A SECRET'
 # PATCH /api/cupcakes/id
 # DELETE /api/cupcakes/id
 
+
 @app.route('/api/cupcakes')
 def get_all_cupcakes():
     """Get data about all cupcakes."""
@@ -28,15 +29,17 @@ def get_all_cupcakes():
 
     return jsonify(cupcakes=serialized)
 
+
 @app.route('/api/cupcakes/<int:cupcake_id>')
 def get_individual_cupcake(cupcake_id):
-    """Get data about a single cupcake.""" 
+    """Get data about a single cupcake."""
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
     serialized = cupcake.serialize()
 
     return jsonify(cupcake=serialized)
-    
+
+
 @app.route('/api/cupcakes', methods=['POST'])
 def create_new_cupcake():
     """Create a cupcake with flavor, size, rating and image data from the body of the request."""
@@ -45,25 +48,26 @@ def create_new_cupcake():
     size = request.json["size"]
     rating = request.json["rating"]
     image = request.json["image"] if request.json["image"] else None
-    
+
     cupcake = Cupcake(
         flavor=flavor,
         size=size,
         rating=rating,
         image=image
-        )
-    
+    )
+
     db.session.add(cupcake)
     db.session.commit()
-    
+
     return (jsonify(cupcake=cupcake.serialize()), 201)
+
 
 @app.route('/api/cupcakes/<int:cupcake_id>', methods=["PATCH"])
 def update_current_cupcake(cupcake_id):
     """Update a cupcake with the id passed in the URL and flavor, size, rating and image data from the body of the request. """
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
-    
+
     cupcake.flavor = request.json["flavor"]
     cupcake.size = request.json["size"]
     cupcake.rating = request.json["rating"]
@@ -91,6 +95,23 @@ def delete_current_cupcake(cupcake_id):
 @app.route('/')
 def root():
 
-    form = CupcakeForm()
+    cupcakeForm = CupcakeForm()
+    searchForm = SearchTermForm()
 
-    return render_template("base.html", form=form)
+    term = searchForm.term.data
+
+    cupcakes = Cupcake.query.filter(Cupcake.flavor.like(f'%{term}%'))
+
+    return render_template("base.html",
+                           cupcakeForm=cupcakeForm,
+                           searchForm=searchForm)
+
+@app.route('/api/cupcakes/search')
+def search():
+
+    term = request.args["term"]
+
+    cupcakes = Cupcake.query.filter(Cupcake.flavor.like(f'%{term}%'))
+    serialized = [c.serialize() for c in cupcakes]
+
+    return jsonify(cupcakes=serialized)

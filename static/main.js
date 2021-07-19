@@ -9,13 +9,30 @@ async function getCupcakes() {
     return response.data;
 }
 
-async function displayCupcakes() {
+async function filteredCupcakes(){
 
-    let cupcakes = await getCupcakes();
+    let response = await axios.get(`${BASE_URL}/search`, params={"term": $("#term").val()});
+    return response.data;
 
-    for (let cupcake of cupcakes.cupcakes) {
-        $("#cupcake-list").append(`<li>${cupcake.flavor}</li>`)
-    };
+}
+
+async function displayCupcakes(term="") {
+
+    if (term === "") {
+        let cupcakes = await getCupcakes();
+
+        for (let cupcake of cupcakes.cupcakes) {
+            $("#cupcake-list").append(`<li>${cupcake.flavor}</li>`)
+        };
+    } else {
+        let cupcakes = await filteredCupcakes();
+
+        for (let cupcake of cupcakes.cupcakes) {
+            $("#cupcake-list").append(`<li>${cupcake.flavor}</li>`)
+        };
+    }
+
+    
 }
 
 /*
@@ -25,6 +42,7 @@ async function displayCupcakes() {
 async function addCupcake(evt) {
     evt.preventDefault();
     
+    
     let flavor = $("#flavor").val();
     let size = $("#size").val();
     let rating = $("#rating").val();
@@ -33,6 +51,7 @@ async function addCupcake(evt) {
     let resp = await axios.post(BASE_URL,
         { "flavor": flavor, "size": size, "rating": rating, "image": image})
     
+    $('#cupcake-form').trigger("reset");
     updateCupcakesList();
 }
 
@@ -43,6 +62,12 @@ async function updateCupcakesList() {
     $("#cupcake-list").empty()
     await displayCupcakes()
 }
+
+/**
+ * Filter list based on search term
+ */
+
+
 
 $(displayCupcakes);
 $("#create-cupcake").on("click", addCupcake);
