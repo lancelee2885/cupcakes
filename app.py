@@ -21,7 +21,7 @@ def get_all_cupcakes():
     """Get data about all cupcakes."""
 
     cupcakes = Cupcake.query.all()
-    serialized = [c.serialized() for c in cupcakes]
+    serialized = [c.serialize() for c in cupcakes]
 
     return jsonify(cupcakes=serialized)
 
@@ -33,3 +33,24 @@ def get_individual_cupcake(cupcake_id):
     serialized = cupcake.serialize()
 
     return jsonify(cupcake=serialized)
+    
+@app.route('/api/cupcakes', methods=['POST'])
+def create_new_cupcake():
+    """Create a cupcake with flavor, size, rating and image data from the body of the request."""
+    
+    flavor = request.json["flavor"]
+    size = request.json["size"]
+    rating = request.json["rating"]
+    image = request.json["image"]
+    
+    cupcake = Cupcake(
+        flavor=flavor,
+        size=size,
+        rating=rating,
+        image=image
+        )
+    
+    db.session.add(cupcake)
+    db.session.commit()
+    
+    return (jsonify(cupcake=cupcake.serialize()), 201)
