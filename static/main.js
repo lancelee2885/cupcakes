@@ -1,37 +1,25 @@
+"use strict"
 const BASE_URL = "/api/cupcakes"
 
 /*
  * makes an AJAX call to the api
  * returns an array of cupcakes(objects)
 */
-async function getCupcakes() {
-    let response = await axios.get(BASE_URL);
-    return response.data;
+
+async function getCupcakes(term) {
+    return await Cupcake.fetchAllCupcakes(term);
 }
 
-async function filteredCupcakes(){
+/*
+ * builds the list elements in the DOM
+*/
+async function displayCupcakes() {
 
-    let response = await axios.get(`${BASE_URL}/search`, params={"term": $("#term").val()});
-    return response.data;
-
-}
-
-async function displayCupcakes(term="") {
-
-    if (term === "") {
-        let cupcakes = await getCupcakes();
-
-        for (let cupcake of cupcakes.cupcakes) {
-            $("#cupcake-list").append(`<li>${cupcake.flavor}</li>`)
-        };
-    } else {
-        let cupcakes = await filteredCupcakes();
-
-        for (let cupcake of cupcakes.cupcakes) {
-            $("#cupcake-list").append(`<li>${cupcake.flavor}</li>`)
-        };
-    }
-
+    let cupcakes = await getCupcakes($("#term").val());
+    debugger;
+    for (let cupcake of cupcakes.cupcakes) {
+        $("#cupcake-list").append(`<li>${cupcake.flavor}</li>`)
+    };
     
 }
 
@@ -41,15 +29,15 @@ async function displayCupcakes(term="") {
 */
 async function addCupcake(evt) {
     evt.preventDefault();
-    
-    
-    let flavor = $("#flavor").val();
-    let size = $("#size").val();
-    let rating = $("#rating").val();
-    let image = $("#image").val();
 
-    let resp = await axios.post(BASE_URL,
-        { "flavor": flavor, "size": size, "rating": rating, "image": image})
+    let cupcake = new Cupcake({
+        flavor : $("#flavor").val(),
+        size : $("#size").val(),
+        rating : $("#rating").val(),
+        image : $("#image").val(),
+    })
+        
+    cupcake.addCupcake()
     
     $('#cupcake-form').trigger("reset");
     updateCupcakesList();
@@ -66,8 +54,12 @@ async function updateCupcakesList() {
 /**
  * Filter list based on search term
  */
-
+async function searchCupcake(evt){
+    evt.preventDefault();
+    await updateCupcakesList();
+}
 
 
 $(displayCupcakes);
 $("#create-cupcake").on("click", addCupcake);
+$("#search-cupcake").on("click", searchCupcake);
